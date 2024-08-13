@@ -6,8 +6,8 @@ int main() {
   using namespace std::literals;
   auto filePath = "/home/ike/magic/x.zip"s;
   auto destFolder = "/home/ike/magic"s;
-
-  if (!FileFormatValidator::validateFormat(filePath)) {
+  FileFormatValidator::instanse().registFileMagicNum({"zip", "PK\x03\x04"});
+  if (!FileFormatValidator::instanse().validateFormat(filePath)) {
     std::cerr << "File format does not match the extension!" << std::endl;
     return 1;
   }
