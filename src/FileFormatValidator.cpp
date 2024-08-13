@@ -1,6 +1,7 @@
 #include "FileFormatValidator.h"
 #include <fstream>
 #include <iostream>
+#include <unordered_map>
 
 std::string FileFormatValidator::getFileExtension(const std::string &filePath) {
   return filePath.substr(filePath.find_last_of(".") + 1);
@@ -20,18 +21,17 @@ bool FileFormatValidator::validateByExtension(
 
 bool FileFormatValidator::validateFormat(const std::string &filePath) {
   std::string ext = getFileExtension(filePath);
-  auto fun = [&filePath](const std::string &magic) -> bool {
-    return validateByExtension(filePath, magic);
+  static const std::unordered_map<std::string, std::string> magicNumbers = {
+      {"gz", "\x1F\x8B\x08\x00"},  // gzip magic number
+      {"zip", "PK\x03\x04"},       // zip magic number
+      {"rar", "Rar!"},             // rar magic number
+      {"7z", "7z\xBC\xAF\x27\x1C"} // 7z magic number
   };
-  if (ext == "gz") {
-    return fun("\x1F\x8B\x08\x00"); // gzip magic number
-  } else if (ext == "zip") {
-    return fun("PK\x03\x04"); // zip magic number
-  } else if (ext == "rar") {
-    return fun("Rar!"); // rar magic number
-  } else if (ext == "7z") {
-    return fun("7z\xBC\xAF\x27\x1C"); // 7z magic number
+
+  if (auto it = magicNumbers.find(ext); it != magicNumbers.end()) {
+    return validateByExtension(filePath, it->second);
   }
+
   return false;
 }
 
