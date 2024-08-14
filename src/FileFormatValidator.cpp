@@ -4,11 +4,12 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <utility>
+#include <vector>
 
 std::unique_ptr<FileFormatValidator> FileFormatValidator::ptr_;
 std::unique_ptr<FileFormatValidator::MapType>
     FileFormatValidator::magicNumbers_ptr_;
+
 FileFormatValidator &FileFormatValidator::instanse() {
   if (ptr_.get() == nullptr) {
     class Helper : public FileFormatValidator {};
@@ -21,6 +22,18 @@ FileFormatValidator &FileFormatValidator::instanse() {
     magicNumbers_ptr_->insert({"7z", "7z\xBC\xAF\x27\x1C"}); // 7z magic number
   }
   return *(ptr_.get());
+}
+
+std::vector<std::string> FileFormatValidator::findFilesWithExtension(
+    const std::vector<std::string> &files, const std::string &extension) {
+  std::vector<std::string> result;
+  result.reserve(files.size() / 2);
+  for (const auto &file : files) {
+    if (getFileExtension(file) == extension) {
+      result.emplace_back(file);
+    }
+  }
+  return result;
 }
 
 void FileFormatValidator::registFileMagicNum(
@@ -51,6 +64,6 @@ bool FileFormatValidator::validateFormat(const std::string &filePath) {
   if (auto it = magicNumbers.find(ext); it != magicNumbers.end()) {
     return validateByExtension(filePath, it->second);
   }
-
+  std::cout << "[INFO] no registery the \"" << ext << "\" type\n";
   return false;
 }

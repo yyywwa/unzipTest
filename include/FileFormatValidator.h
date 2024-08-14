@@ -3,6 +3,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 class FileFormatValidator {
 public:
@@ -10,6 +11,10 @@ public:
   bool isGltfValid(const std::string &filePath);
   static FileFormatValidator &instanse();
   void registFileMagicNum(std::pair<std::string, std::string>);
+
+  std::vector<std::string>
+  findFilesWithExtension(const std::vector<std::string> &files,
+                         const std::string &extension);
 
 private:
   FileFormatValidator(){};
